@@ -1,0 +1,7 @@
+[package]
+name = "mc_bot_cli"
+version = "0.1.0"
+
+[dependencies]
+mc_protocol = { git = "https://github.com/almd-mc/mc-protocol" }
+mc_bot = { git = "https://github.com/almd-mc/mc-bot" }

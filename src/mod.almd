@@ -1,0 +1,30 @@
+import process
+import mc_bot
+
+// mc-bot-cli: CLI for the Almide Minecraft bot.
+//
+// Usage:
+//   mc-bot-cli [host] [port]
+//   mc-bot-cli --help
+
+effect fn main() -> Unit = {
+  let args = process.args()
+
+  let cmd = list.get(args, 1) ?? ""
+  if cmd == "--help" or cmd == "-h" then {
+    println("mc-bot-cli — Almide Minecraft bot")
+    println("")
+    println("Usage:")
+    println("  mc-bot-cli [host] [port]     Connect to server (default: localhost:25565)")
+    println("")
+    println("Options:")
+    println("  --help, -h                   Show this help")
+    println("")
+    println("On first run, opens Microsoft device code auth in browser.")
+    println("Token is cached for subsequent runs.")
+  } else {
+    let host = list.get(args, 1) ?? "localhost"
+    let port = int.parse(list.get(args, 2) ?? "25565") ?? 25565
+    mc_bot.start({ ...mc_bot.DEFAULT_CONFIG, host: host, port: port })!
+  }
+}
