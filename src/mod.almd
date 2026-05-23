@@ -7,24 +7,71 @@ import mc_bot
 //   mc-bot-cli [host] [port]
 //   mc-bot-cli --help
 
-effect fn main() -> Unit = {
-  let args = process.args()
+type ParsedArgs = | Help | Connect(String, Int)
 
+fn parse_args(args: List[String]) -> ParsedArgs = {
   let cmd = list.get(args, 1) ?? ""
-  if cmd == "--help" or cmd == "-h" then {
-    println("mc-bot-cli — Almide Minecraft bot")
-    println("")
-    println("Usage:")
-    println("  mc-bot-cli [host] [port]     Connect to server (default: localhost:25565)")
-    println("")
-    println("Options:")
-    println("  --help, -h                   Show this help")
-    println("")
-    println("On first run, opens Microsoft device code auth in browser.")
-    println("Token is cached for subsequent runs.")
-  } else {
+  if cmd == "--help" or cmd == "-h" then Help
+  else {
     let host = list.get(args, 1) ?? "localhost"
     let port = int.parse(list.get(args, 2) ?? "25565") ?? 25565
-    mc_bot.start({ ...mc_bot.DEFAULT_CONFIG, host: host, port: port })!
+    Connect(host, port)
+  }
+}
+
+effect fn main() -> Unit = {
+  let args = process.args()
+  match parse_args(args) {
+    Help => {
+      println("mc-bot-cli — Almide Minecraft bot")
+      println("")
+      println("Usage:")
+      println("  mc-bot-cli [host] [port]     Connect to server (default: localhost:25565)")
+      println("")
+      println("Options:")
+      println("  --help, -h                   Show this help")
+      println("")
+      println("On first run, opens Microsoft device code auth in browser.")
+      println("Token is cached for subsequent runs.")
+    },
+    Connect(host, port) => mc_bot.start({ ...mc_bot.DEFAULT_CONFIG, host: host, port: port })!,
+  }
+}
+
+test "parse --help" {
+  assert_eq(parse_args(["mc-bot", "--help"]), Help)
+}
+
+test "parse -h" {
+  assert_eq(parse_args(["mc-bot", "-h"]), Help)
+}
+
+test "parse default" {
+  match parse_args(["mc-bot"]) {
+    Connect(host, port) => {
+      assert_eq(host, "localhost")
+      assert_eq(port, 25565)
+    },
+    Help => assert(false),
+  }
+}
+
+test "parse custom host port" {
+  match parse_args(["mc-bot", "example.com", "12345"]) {
+    Connect(host, port) => {
+      assert_eq(host, "example.com")
+      assert_eq(port, 12345)
+    },
+    Help => assert(false),
+  }
+}
+
+test "parse invalid port defaults" {
+  match parse_args(["mc-bot", "server.net", "abc"]) {
+    Connect(host, port) => {
+      assert_eq(host, "server.net")
+      assert_eq(port, 25565)
+    },
+    Help => assert(false),
   }
 }
