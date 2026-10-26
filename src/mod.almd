@@ -1,4 +1,4 @@
-import process
+import env
 import mc_bot
 
 // mc-bot-cli: CLI for the Almide Minecraft bot.
@@ -10,17 +10,17 @@ import mc_bot
 type ParsedArgs = | Help | Connect(String, Int)
 
 fn parse_args(args: List[String]) -> ParsedArgs = {
-  let cmd = list.get(args, 1) ?? ""
+  let cmd = list.get(args, 0) ?? ""
   if cmd == "--help" or cmd == "-h" then Help
   else {
-    let host = list.get(args, 1) ?? "localhost"
-    let port = int.parse(list.get(args, 2) ?? "25565") ?? 25565
+    let host = list.get(args, 0) ?? "localhost"
+    let port = int.parse(list.get(args, 1) ?? "25565") ?? 25565
     Connect(host, port)
   }
 }
 
 effect fn main() -> Unit = {
-  let args = process.args()
+  let args = env.args()
   match parse_args(args) {
     Help => {
       println("mc-bot-cli — Almide Minecraft bot")
@@ -39,15 +39,15 @@ effect fn main() -> Unit = {
 }
 
 test "parse --help" {
-  assert_eq(parse_args(["mc-bot", "--help"]), Help)
+  assert_eq(parse_args(["--help"]), Help)
 }
 
 test "parse -h" {
-  assert_eq(parse_args(["mc-bot", "-h"]), Help)
+  assert_eq(parse_args(["-h"]), Help)
 }
 
 test "parse default" {
-  match parse_args(["mc-bot"]) {
+  match parse_args([]) {
     Connect(host, port) => {
       assert_eq(host, "localhost")
       assert_eq(port, 25565)
@@ -57,7 +57,7 @@ test "parse default" {
 }
 
 test "parse custom host port" {
-  match parse_args(["mc-bot", "example.com", "12345"]) {
+  match parse_args(["example.com", "12345"]) {
     Connect(host, port) => {
       assert_eq(host, "example.com")
       assert_eq(port, 12345)
@@ -67,7 +67,7 @@ test "parse custom host port" {
 }
 
 test "parse invalid port defaults" {
-  match parse_args(["mc-bot", "server.net", "abc"]) {
+  match parse_args(["server.net", "abc"]) {
     Connect(host, port) => {
       assert_eq(host, "server.net")
       assert_eq(port, 25565)
