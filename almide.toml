@@ -10,3 +10,6 @@ mc_bot = { git = "https://github.com/almd-mc/mc-bot" }
 # from an owner the root manifest trusts.
 [trust]
 owners = ["github.com/almd-mc"]
+
+[permissions]
+native = ["aes", "sha1"]
