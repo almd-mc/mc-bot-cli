@@ -1,0 +1,4 @@
+# almide.lock — auto-generated, do not edit
+
+mc_protocol = { git = "https://github.com/almd-mc/mc-protocol", ref = "main", commit = "d4713bb5f6c4c388853670d062334362ca348a0a" }
+mc_bot = { git = "https://github.com/almd-mc/mc-bot", ref = "main", commit = "54a0d08c4cd7b281f1fd0c301d2cf61d8da166aa" }
